@@ -60,6 +60,3 @@ identifiers:
    (unified-memory swap freezes).
 5. Fair bars: score both models on the identical harness; fuse-and-reset — each lane
    trains on the fused winner, never the original base.
-
-## Model card
-https://huggingface.co/Bananatata/compact-q2b-v3-fused
