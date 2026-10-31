@@ -5,9 +5,9 @@
 # (new32 vs v25, locked13 vs 0.6059, fin_ok required).
 set -eu
 
-BASE=/Users/b/lora-finetune/compact
-TOOLS=/Users/b/.local/bin
-KEY=$(python3 -c 'import json;print(json.load(open("/Users/b/.omlx/settings.json"))["auth"]["api_key"])')
+BASE=$HOME/lora-finetune/compact
+TOOLS=$HOME/.local/bin
+KEY=$(python3 -c 'import json,os;print(json.load(open(os.path.expanduser("~/.omlx/settings.json")))["auth"]["api_key"])')
 API=http://127.0.0.1:8000/v1/chat/completions
 HEALTH=http://127.0.0.1:8000/health
 MODELS=$HOME/.omlx/models
@@ -22,11 +22,11 @@ log() { echo "[$(date '+%H:%M:%S')] $*"; }
 python3 - <<'PYEOF' > "$LOGDIR/stage1-harvest.log" 2>&1
 import json, os, re, sqlite3, sys, time, urllib.request
 
-BASE = '/Users/b/lora-finetune/compact'
+BASE = os.path.expanduser('~/lora-finetune/compact')
 KEY = json.load(open(os.path.expanduser('~/.omlx/settings.json')))['auth']['api_key']
 API = 'http://127.0.0.1:8000/v1/chat/completions'
 STUDENT = 'compact-q35-v25-it48-fused'
-sys.path.insert(0, '/Users/b/.hermes/plugins/hybrid_ledger')
+sys.path.insert(0, os.path.expanduser('~/.hermes/plugins/hybrid_ledger'))
 from engine import COMPACTION_SYSTEM_PROMPT, identifiers, bhit, norm, THINK, STOP
 
 def log(m): print(f"[{time.strftime('%H:%M:%S')}] {m}", flush=True)
@@ -103,8 +103,8 @@ log "harvest: $(tail -1 "$LOGDIR/stage1-harvest.log")"
 
 # ---- stage 2: merge = v27 60 + v2 41 + v3 harvest, cap prompt 24k ---------
 python3 - <<'PYEOF' > "$LOGDIR/stage2-merge.log" 2>&1
-import json
-BASE = '/Users/b/lora-finetune/compact'
+import json, os
+BASE = os.path.expanduser('~/lora-finetune/compact')
 rows, seen = [], set()
 n_drop = 0
 for path in (f'{BASE}/data/v27-sft/train.jsonl',
@@ -188,10 +188,10 @@ log "omlx health=$code after ${i} polls"
 python3 - <<'PYEOF' > "$LOGDIR/stage5-gate.log" 2>&1
 import json, os, re, sys, time, urllib.request
 
-BASE = '/Users/b/lora-finetune/compact'
+BASE = os.path.expanduser('~/lora-finetune/compact')
 KEY = json.load(open(os.path.expanduser('~/.omlx/settings.json')))['auth']['api_key']
 API = 'http://127.0.0.1:8000/v1/chat/completions'
-sys.path.insert(0, '/Users/b/.hermes/plugins/hybrid_ledger')
+sys.path.insert(0, os.path.expanduser('~/.hermes/plugins/hybrid_ledger'))
 from engine import COMPACTION_SYSTEM_PROMPT, identifiers, bhit, norm, THINK, STOP
 
 def call(model, user_content):
